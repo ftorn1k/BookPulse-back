@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -24,7 +25,7 @@ func (j *JWT) GenerateToken(userID uint) (string, error) {
 	claims := Claims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour * 30)), // 30 дней
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour * 30)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
@@ -44,4 +45,18 @@ func (j *JWT) ParseToken(tokenStr string) (*Claims, error) {
 		return nil, errors.New("invalid token")
 	}
 	return claims, nil
+}
+
+func MustAuth(r *http.Request, jwt *JWT) (int, bool) {
+	h := r.Header.Get("Authorization")
+	const prefix = "Bearer "
+	if len(h) <= len(prefix) || h[:len(prefix)] != prefix {
+		return 0, false
+	}
+	token := h[len(prefix):]
+	claims, err := jwt.ParseToken(token)
+	if err != nil {
+		return 0, false
+	}
+	return int(claims.UserID), true
 }
