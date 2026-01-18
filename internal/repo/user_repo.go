@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -36,31 +37,38 @@ func (r *UserRepoPGX) Create(ctx context.Context, email, name, passwordHash stri
 }
 
 func (r *UserRepoPGX) FindByEmail(ctx context.Context, email string) (*User, error) {
-	var u User
-	err := r.db.QueryRow(ctx, `
-		SELECT id, email, name, password_hash
-		FROM users
-		WHERE email = $1;
-	`, email).Scan(&u.ID, &u.Email, &u.Name, &u.PasswordHash)
+ var u User
+ err := r.db.QueryRow(ctx, `
+  SELECT id, email, name, password_hash
+  FROM users
+  WHERE email = $1;
+ `, email).Scan(&u.ID, &u.Email, &u.Name, &u.PasswordHash)
 
-	if err != nil {
-		return nil, nil
-	}
-	return &u, nil
+ if err != nil {
+  if errors.Is(err, pgx.ErrNoRows) {
+   return nil, nil // не найден — это не "ошибка"
+  }
+  return nil, err // любая другая ошибка — отдаём наверх
+ }
+ return &u, nil
 }
 
 func (r *UserRepoPGX) FindByID(ctx context.Context, id int) (*User, error) {
-	var u User
-	err := r.db.QueryRow(ctx, `
-		SELECT id, email, name, password_hash
-		FROM users
-		WHERE id = $1;
-	`, id).Scan(&u.ID, &u.Email, &u.Name, &u.PasswordHash)
+ var u User
+ err := r.db.QueryRow(ctx, `
+  SELECT id, email, name, password_hash
+  FROM users
+  WHERE id = $1;
+ `, id).Scan(&u.ID, &u.Email, &u.Name, &u.PasswordHash)
 
-	if err != nil {
-		return nil, nil
-	}
-	return &u, nil
+ if err != nil {
+  if errors.Is(err, pgx.ErrNoRows) {
+   return nil, nil
+  }
+  return nil, err
+ }
+ return &u, nil
 }
+
 
 var ErrInvalidCredentials = errors.New("invalid credentials")

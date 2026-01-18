@@ -16,11 +16,11 @@ func InitDB() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	DBpool, err := pgxpool.New(ctx, dsn)
+	var err error
+	DBpool, err = pgxpool.New(ctx, dsn)
 	if err != nil {
 		log.Fatal("Ошибка подключения к БД:", err)
 	}
-	defer DBpool.Close()
 
 	if err := DBpool.Ping(ctx); err != nil {
 		log.Fatal("БД не отвечает:", err)
@@ -37,6 +37,5 @@ func InitDB() {
 	if err != nil {
 		log.Fatal("Не удалось создать таблицу users:", err)
 	}
-
 	log.Println("Успешное подключение к PostgreSQL")
 }

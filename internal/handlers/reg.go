@@ -9,7 +9,6 @@ import (
 
 func Register(authSvc *auth.ServicePGX) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		utils.EnableCORS(w, r)
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return

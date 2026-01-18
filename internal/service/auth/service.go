@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"log"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -57,25 +58,33 @@ func (s *ServicePGX) Register(ctx context.Context, email, password, name string)
 }
 
 func (s *ServicePGX) Login(ctx context.Context, email, password string) (*AuthResponse, error) {
-	u, _ := s.users.FindByEmail(ctx, email)
-	if u == nil {
-		return nil, repo.ErrInvalidCredentials
-	}
+ log.Printf("LOGIN email=%q pass_len=%d", email, len(password))
+ u, err := s.users.FindByEmail(ctx, email)
+ if err != nil {
+	log.Printf("LOGIN FindByEmail error: %v", err)
+  return nil, err 
+ }
+ if u == nil {
+	log.Printf("LOGIN user not found")
+  return nil, repo.ErrInvalidCredentials
+ }
 
-	if err := bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password)); err != nil {
-		return nil, repo.ErrInvalidCredentials
-	}
+ if err := bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password)); err != nil {
+	log.Printf("LOGIN bcrypt compare error: %v", err)
+  return nil, repo.ErrInvalidCredentials
+ }
 
-	token, err := s.jwt.GenerateToken(uint(u.ID))
-	if err != nil {
-		return nil, err
-	}
+ token, err := s.jwt.GenerateToken(uint(u.ID))
+ if err != nil {
+  return nil, err
+ }
 
-	return &AuthResponse{
-		Token: token,
-		User:  UserDTO{ID: u.ID, Email: u.Email, Name: u.Name},
-	}, nil
+ return &AuthResponse{
+  Token: token,
+  User:  UserDTO{ID: u.ID, Email: u.Email, Name: u.Name},
+ }, nil
 }
+
 
 func (s *ServicePGX) Me(ctx context.Context, userID int) (*UserDTO, error) {
 	u, _ := s.users.FindByID(ctx, userID)

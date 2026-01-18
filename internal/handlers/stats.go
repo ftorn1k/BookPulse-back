@@ -4,7 +4,7 @@ import (
 	"bookpulse/internal/db"
 	"bookpulse/internal/models"
 	"bookpulse/internal/service/auth"
-	"bookpulse/internal/utils"
+
 	"encoding/json"
 	"net/http"
 )
@@ -16,7 +16,6 @@ type StatsResponse struct {
 
 func StatsHandler(jwt *auth.JWT) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		utils.EnableCORS(w, r)
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return

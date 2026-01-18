@@ -13,7 +13,6 @@ import (
 
 func CurrentUser(authSvc *auth.ServicePGX, jwt *auth.JWT) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		utils.EnableCORS(w, r)
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return
@@ -46,7 +45,6 @@ type UpdateProfileRequest struct {
 
 func UpdateName(jwt *auth.JWT) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		utils.EnableCORS(w, r)
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return
@@ -93,7 +91,6 @@ type UpdatePasswordRequest struct {
 
 func UpdatePassword(jwt *auth.JWT) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		utils.EnableCORS(w, r)
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return

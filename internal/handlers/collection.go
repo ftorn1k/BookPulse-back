@@ -16,7 +16,6 @@ type CreateCollectionRequest struct {
 
 func GetAndAddCollection(jwt *auth.JWT) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		utils.EnableCORS(w, r)
 
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
@@ -142,7 +141,6 @@ type AddBooksToCollectionRequest struct {
 
 func AddBookToCollection(jwt *auth.JWT) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		utils.EnableCORS(w, r)
 
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)

@@ -1,4 +1,4 @@
-package httpapi
+package google
 
 import (
 	"encoding/json"
@@ -20,21 +20,28 @@ func NewGoogleBooksHandler() *GoogleBooksHandler {
 }
 
 type GoogleBookDTO struct {
-	ID            string   `json:"id"` 
+	ID            string   `json:"id"`
 	Title         string   `json:"title"`
 	Authors       []string `json:"authors"`
-	Author        string   `json:"author"` 
+	Author        string   `json:"author"`
 	CoverURL      string   `json:"coverUrl"`
 	Description   string   `json:"description"`
 	Categories    []string `json:"categories"`
 	PublishedYear int      `json:"publishedYear"`
 	PageCount     int      `json:"pageCount"`
-	Maturity      string   `json:"maturity"` 
+	Maturity      string   `json:"maturity"`
 }
 
-
 func (h *GoogleBooksHandler) Search(w http.ResponseWriter, r *http.Request) {
-	enableCORS(w, r)
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -67,7 +74,6 @@ func (h *GoogleBooksHandler) Search(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *GoogleBooksHandler) GetByID(w http.ResponseWriter, r *http.Request) {
-	enableCORS(w, r)
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -99,15 +105,15 @@ type gbSearchResp struct {
 	Items []gbItem `json:"items"`
 }
 type gbItem struct {
-	ID         string         `json:"id"`
-	VolumeInfo gbVolumeInfo   `json:"volumeInfo"`
+	ID         string       `json:"id"`
+	VolumeInfo gbVolumeInfo `json:"volumeInfo"`
 }
 type gbVolumeInfo struct {
 	Title         string   `json:"title"`
 	Authors       []string `json:"authors"`
 	Description   string   `json:"description"`
 	Categories    []string `json:"categories"`
-	PublishedDate string   `json:"publishedDate"` 
+	PublishedDate string   `json:"publishedDate"`
 	PageCount     int      `json:"pageCount"`
 	Maturity      string   `json:"maturityRating"`
 	ImageLinks    struct {
@@ -207,14 +213,7 @@ func parseYear(s string) int {
 	return 0
 }
 
-
 func writeJSON(w http.ResponseWriter, v any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	_ = json.NewEncoder(w).Encode(v)
-}
-
-func enableCORS(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 }
