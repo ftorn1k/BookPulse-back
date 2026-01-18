@@ -1,0 +1,11 @@
+.git
+.idea
+.vscode
+*.log
+
+bin
+dist
+tmp
+
+Dockerfile
+docker-compose.yml
