@@ -11,7 +11,7 @@ import (
 var DBpool *pgxpool.Pool
 
 func InitDB() {
-	dsn := "host=147.45.246.131 port=25432 user=bookpulse password=bookpulse dbname=bookpulse sslmode=disable"
+	dsn := "host=147.45.246.131 port=25432 user=bookpulse password=bookpulse dbname=bookpulse"
 	
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
