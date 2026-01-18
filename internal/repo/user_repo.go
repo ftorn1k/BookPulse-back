@@ -46,9 +46,9 @@ func (r *UserRepoPGX) FindByEmail(ctx context.Context, email string) (*User, err
 
  if err != nil {
   if errors.Is(err, pgx.ErrNoRows) {
-   return nil, nil // не найден — это не "ошибка"
+   return nil, nil 
   }
-  return nil, err // любая другая ошибка — отдаём наверх
+  return nil, err 
  }
  return &u, nil
 }
